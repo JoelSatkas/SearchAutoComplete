@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,8 @@
   "dependencies": {
     "connect": "^3.7.0",
     "serve-static": "^1.14.1"
+  },
+  "devDependencies": {
+    "jasmine": "^3.4.0"
   }
 }

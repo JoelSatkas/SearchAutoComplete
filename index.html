@@ -4,16 +4,24 @@
 <script src="index.js"></script>
 <html>
     <head>
-        <title>Page Title</title>
+        <title>Autocomplete Search</title>
     </head>
     <body>
-    <!--Make sure the form has the autocomplete function switched off:-->
-    <form autocomplete="off" action="/action_page.php">
-        <div class="autocomplete" style="width:300px;">
-            <input id="searchInput" type="text" name="myCountry" placeholder="What are you looking for?">
+        <div class="main-background">
+            <div class="float-over">
+                <h3>Welcome to Plugify</h3>
+                <div class="float-body">
+                    <form autocomplete="off" action="javascript:void(0);">
+                        <div class="autocomplete">
+                            <input id="searchInput" type="text" name="myCountry" placeholder="What are you looking for?">
+                        </div>
+                        <input type="submit">
+                    </form>
+                </div>
+            </div>
+
+            <img class="center-fit" src="background.jpg" alt="Band">
         </div>
-        <input type="submit">
-    </form>
     </body>
 </html>
 <script>

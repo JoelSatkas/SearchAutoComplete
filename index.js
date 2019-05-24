@@ -26,17 +26,13 @@ function init() {
         if (x) x = x.getElementsByTagName("div");
         switch (keyCode) {
             case 40:
-                /*If the arrow DOWN key is pressed,
-                increase the currentFocus variable:*/
+                //If DOWN is pressed, increase the currentFocus variable and make it visible
                 currentFocus++;
-                /*and and make the current item more visible:*/
                 addActive(x);
                 break;
             case 38:
-                /*If the arrow UP key is pressed,
-                decrease the currentFocus variable:*/
+                //If UP is pressed, decrease the currentFocus variable and make it more visible
                 currentFocus--;
-                /*and and make the current item more visible:*/
                 addActive(x);
                 break;
             case 13:
@@ -52,7 +48,7 @@ function init() {
 }
 
 function startAutoComplete() {
-    let searchQuery = this.value;
+    let searchQuery = this.value.toLowerCase();
     /*close any already open lists of autocompleted values*/
     closeAllLists();
     currentFocus = -1;
@@ -80,7 +76,7 @@ function startAutoComplete() {
 function searchJson(searchQuery) {
     let searchResults = [];
 
-    //First come first server
+    //First found first displayed
     APIJson["results"].forEach((resultJsonInstance) => {
         if (searchResults.length < choiceParalysis) {
             switch(resultJsonInstance["_type"]) {
@@ -99,29 +95,19 @@ function searchJson(searchQuery) {
     handleAutocomplete(searchResults);
 }
 
+//Nothing fancy here, just displaying basic results.
 function findSearchInResults(arrayToAddTo, resultJsonInstance, searchQuery, importantAttributes) {
     let score = 0;
     importantAttributes.forEach((importantAttribute) => {
         if (resultJsonInstance[importantAttribute]) {
-            if (resultJsonInstance[importantAttribute].includes(searchQuery)) {
+            if (resultJsonInstance[importantAttribute].toLowerCase().includes(searchQuery)) {
                 score++;
             }
         }
     });
 
     if (score > 0) {
-        constructStringResult(arrayToAddTo, resultJsonInstance)
-    }
-}
-
-function constructStringResult(arrayToAddTo, object) {
-    switch (object["_type"]) {
-        case "city":
-            arrayToAddTo.push(object["name"] + " -> " + object["province"] + "\t in Cities");
-            break;
-        case "artist":
-            arrayToAddTo.push(object["name"] + " -> " + object["main_category"] + "\t in Artists");
-            break;
+        arrayToAddTo.push(resultJsonInstance);
     }
 }
 
@@ -136,11 +122,19 @@ function handleAutocomplete(searchResultArray) {
     for (let i = 0; i < searchResultArray.length; i++) {
         /*create a DIV element for each matching element:*/
         let b = document.createElement("DIV");
+        let searchString = "";
         /*make the matching letters bold:*/
-        b.innerHTML = "<strong>" + searchResultArray[i] + "</strong>";
-        //b.innerHTML += arr[i].substr(val.length);
+        b.innerHTML = "<strong>" + searchResultArray[i].name + "</strong>";
+        switch (searchResultArray[i]._type) {
+            case "artist":
+                b.innerHTML += ", " + searchResultArray[i].main_category + " in " + "<strong style='color: darkmagenta'>" + " Artists " + "</strong>";
+                break;
+            case "city":
+                b.innerHTML += ", " + searchResultArray[i].province + " in " + "<strong style='color: darkmagenta'>" + " Cities " + "</strong>";;
+                break;
+        }
         /*insert a input field that will hold the current array item's value:*/
-        b.innerHTML += "<input type='hidden' value='" + searchResultArray[i] + "'>";
+        b.innerHTML += "<input type='hidden' value='" + searchResultArray[i].name + "'>";
         /*execute a function when someone clicks on the item value (DIV element):*/
         b.addEventListener("click", function(e) {
             /*insert the value for the autocomplete text field:*/
