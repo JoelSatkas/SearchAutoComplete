@@ -60,16 +60,15 @@ function startAutoComplete() {
  * @param searchQuery - The new value inside the input field
  */
 function begin(searchQuery) {
-    /*close any already open lists of autocompleted values*/
-    closeAllLists();
-    currentFocus = -1;
-
     //If its empty clear the json
     //This saves on network calls, increases speed of search and decreases network costs for mobile users.
     if(searchQuery === "") {
         APIJson = undefined;
+        closeAllLists();
         return;
     }
+
+    currentFocus = -1;
 
     if(APIJson === undefined) {
         //Get json from API
@@ -148,6 +147,7 @@ function handleFindingResults(arrayToAddTo, resultJsonInstance, searchQuery, imp
  * @param searchResultArray - An array of object results that will be shown in the drop down list.
  */
 function handleAutocomplete(searchResultArray) {
+    closeAllLists();
     let input = document.getElementById(inputId);
     let dropDownList = document.createElement("DIV");
     dropDownList.setAttribute("id", "autocomplete-list");
