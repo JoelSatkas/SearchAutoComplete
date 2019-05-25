@@ -65,14 +65,18 @@ describe("The unit test suite for the project", function() {
         });
 
         it("with JSON present, calls the appropriate functions", function() {
-            //Closes the list when a new value is entered
-            spyOn(window, "closeAllLists");
             //Sends its query to handleSearch
             spyOn(window, "handleSearch");
 
             testFunction(APISearchQuery);
-            expect(window.closeAllLists).toHaveBeenCalled();
             expect(window.handleSearch).toHaveBeenCalled();
+        });
+
+        it("Clears the list when empty query", function() {
+            //Closes the list when a new value is entered
+            spyOn(window, "closeAllLists");
+            testFunction(APISearchQuery);
+            expect(window.closeAllLists).toHaveBeenCalled();
         });
 
         it("with JSON present, the handler is called all the way through", function() {
