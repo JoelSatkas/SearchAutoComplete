@@ -14,6 +14,9 @@ const artistAttributes = [
 
 let currentFocus;
 
+/***
+ * A set up that will instantiate event listeners for the input field
+ */
 function init() {
     document.getElementById(inputId).addEventListener("input", startAutoComplete);
     /*execute a function presses a key on the keyboard:*/
@@ -45,10 +48,17 @@ function init() {
     });
 }
 
+/***
+ * Handler for an input to the input field
+ */
 function startAutoComplete() {
     begin(this.value.toLowerCase());
 }
 
+/***
+ * The beginning of the search. This was separated from the input handler so we can test the main functionality.
+ * @param searchQuery - The new value inside the input field
+ */
 function begin(searchQuery) {
     /*close any already open lists of autocompleted values*/
     closeAllLists();
@@ -63,7 +73,6 @@ function begin(searchQuery) {
 
     if(APIJson === undefined) {
         //Get json from API
-        //Pass in callback
         getJsonFromAPI(searchQuery, function () {
             handleSearch(searchQuery);
         });
@@ -74,11 +83,20 @@ function begin(searchQuery) {
     }
 }
 
+/***
+ * Once we have the json, this method will handle finding the results and displaying them
+ * @param searchQuery - The search query the user entered into the input field
+ */
 function handleSearch(searchQuery) {
     let searchResults = searchJson(searchQuery);
     handleAutocomplete(searchResults);
 }
 
+/***
+ * Finds objects that could be related to what the user is looking for
+ * @param searchQuery - The search query the user entered into the input field
+ * @returns {Array} - An array of objects that will be displayed as autocomplete results
+ */
 function searchJson(searchQuery) {
     let searchResults = [];
 
@@ -87,23 +105,30 @@ function searchJson(searchQuery) {
         if (searchResults.length < choiceParalysis) {
             switch(resultJsonInstance["_type"]) {
                 case "city":
-                    findSearchInResults(searchResults, resultJsonInstance, searchQuery, cityAttributes);
+                    handleFindingResults(searchResults, resultJsonInstance, searchQuery, cityAttributes);
                     break;
                 case "artist":
-                    findSearchInResults(searchResults, resultJsonInstance, searchQuery, artistAttributes);
+                    handleFindingResults(searchResults, resultJsonInstance, searchQuery, artistAttributes);
                     break;
                 case "default":
                     //Can add more type here for the future.
             }
         }
     });
-    //Debugging
-    console.log(searchResults);
+    console.log(searchResults);//Debugging
     return searchResults;
 }
 
-//Nothing fancy here, just displaying basic results.
-function findSearchInResults(arrayToAddTo, resultJsonInstance, searchQuery, importantAttributes) {
+
+/***
+ * This function decides if the object passed in is something the user might be looking for
+ * Nothing fancy here, just displaying what ever contains the string.
+ * @param arrayToAddTo - A result array that this function will add its found objects to.
+ * @param resultJsonInstance - The object to consider.
+ * @param searchQuery - The search query that was passed in by the user
+ * @param importantAttributes - An array of important attributes of the object that we should consider.
+ */
+function handleFindingResults(arrayToAddTo, resultJsonInstance, searchQuery, importantAttributes) {
     let score = 0;
     importantAttributes.forEach((importantAttribute) => {
         if (resultJsonInstance[importantAttribute]) {
@@ -118,6 +143,10 @@ function findSearchInResults(arrayToAddTo, resultJsonInstance, searchQuery, impo
     }
 }
 
+/***
+ * This function will take in the results and manipulate the DOM to create a drop down of the results
+ * @param searchResultArray - An array of object results that will be shown in the drop down list.
+ */
 function handleAutocomplete(searchResultArray) {
     let input = document.getElementById(inputId);
     let dropDownList = document.createElement("DIV");
@@ -153,6 +182,11 @@ function handleAutocomplete(searchResultArray) {
     });
 }
 
+/***
+ * Will query the API for some search results
+ * @param searchQuery - The query imputed by the user
+ * @param callBack - A callback function that will be called when its finished
+ */
 function getJsonFromAPI(searchQuery, callBack) {
     let callingUrl = APIurl + "?query=" + searchQuery;
 
@@ -168,8 +202,14 @@ function getJsonFromAPI(searchQuery, callBack) {
     });
 }
 
+/***
+ * Function to handle the error of querying the API
+ * @param error - Error object
+ * @constructor
+ */
 function APICallbackFailed(error) {
     report(error.toString());
+    //Some pop up could be good here
 }
 
 function report(message) {

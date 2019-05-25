@@ -8,7 +8,6 @@ describe("The unit test suite for the project", function() {
         $(done);
     });
 
-//This test should go first to populate the instances APIJson
     describe("The getJsonFromAPI function", function() {
         let testFunction = getJsonFromAPI;
         it("Can pull the API and get a JSON", function(done) {
@@ -35,11 +34,11 @@ describe("The unit test suite for the project", function() {
             });
         });
 
-        it("calls the sub-function 'findSearchInResults'", function() {
-            spyOn(window, "findSearchInResults");
+        it("calls the sub-function 'handleFindingResults'", function() {
+            spyOn(window, "handleFindingResults");
             searchQuery = APISearchQuery;
             testFunction(searchQuery);
-            expect(window.findSearchInResults).toHaveBeenCalled();
+            expect(window.handleFindingResults).toHaveBeenCalled();
         });
 
         it("finds some results", function() {
@@ -76,7 +75,7 @@ describe("The unit test suite for the project", function() {
             expect(window.handleSearch).toHaveBeenCalled();
         });
 
-        it("with JSON present, the handler is called", function() {
+        it("with JSON present, the handler is called all the way through", function() {
             spyOn(window, "searchJson");
             spyOn(window, "handleAutocomplete");
 
@@ -95,7 +94,6 @@ describe("The unit test suite for the project", function() {
 
         it("with JSON missing, calls the handler after receiving json", function(done) {
             APIJson = undefined;
-            //Closes the list when a new value is entered
             spyOn(window, "handleSearch");
 
             testFunction(APISearchQuery);
