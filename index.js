@@ -1,11 +1,9 @@
-var APIJson;
-
 const choiceParalysis = 10;
-
+let APIJson;
 const APIurl = "https://api.earlytestabc.plugify.nl/autocomplete.json";
 const inputId = "searchInput";
 
-const cityAtrributes = [
+const cityAttributes = [
     "name",
     "province"
 ];
@@ -20,7 +18,7 @@ function init() {
     document.getElementById(inputId).addEventListener("input", startAutoComplete);
     /*execute a function presses a key on the keyboard:*/
     document.getElementById(inputId).addEventListener("keydown", function(e) {
-        var keyDownEvent = event || window.event,
+        let keyDownEvent = event || window.event,
             keyCode = (keyDownEvent.which) ? keyDownEvent.which : keyDownEvent.keyCode;
         let x = document.getElementById("autocomplete-list");
         if (x) x = x.getElementsByTagName("div");
@@ -48,14 +46,17 @@ function init() {
 }
 
 function startAutoComplete() {
-    let searchQuery = this.value.toLowerCase();
+    begin(this.value.toLowerCase());
+}
+
+function begin(searchQuery) {
     /*close any already open lists of autocompleted values*/
     closeAllLists();
     currentFocus = -1;
-    
+
     //If its empty clear the json
     //This saves on network calls, increases speed of search and decreases network costs for mobile users.
-    if(this.value === "") {
+    if(searchQuery === "") {
         APIJson = undefined;
         return;
     }
@@ -64,13 +65,18 @@ function startAutoComplete() {
         //Get json from API
         //Pass in callback
         getJsonFromAPI(searchQuery, function () {
-            searchJson(searchQuery);
+            handleSearch(searchQuery);
         });
     }
     else{
         //  Use the json we already have
-        searchJson(searchQuery);
+        handleSearch(searchQuery);
     }
+}
+
+function handleSearch(searchQuery) {
+    let searchResults = searchJson(searchQuery);
+    handleAutocomplete(searchResults);
 }
 
 function searchJson(searchQuery) {
@@ -81,7 +87,7 @@ function searchJson(searchQuery) {
         if (searchResults.length < choiceParalysis) {
             switch(resultJsonInstance["_type"]) {
                 case "city":
-                    findSearchInResults(searchResults, resultJsonInstance, searchQuery, cityAtrributes);
+                    findSearchInResults(searchResults, resultJsonInstance, searchQuery, cityAttributes);
                     break;
                 case "artist":
                     findSearchInResults(searchResults, resultJsonInstance, searchQuery, artistAttributes);
@@ -91,8 +97,9 @@ function searchJson(searchQuery) {
             }
         }
     });
+    //Debugging
     console.log(searchResults);
-    handleAutocomplete(searchResults);
+    return searchResults;
 }
 
 //Nothing fancy here, just displaying basic results.
@@ -113,38 +120,37 @@ function findSearchInResults(arrayToAddTo, resultJsonInstance, searchQuery, impo
 
 function handleAutocomplete(searchResultArray) {
     let input = document.getElementById(inputId);
-    let a = document.createElement("DIV");
-    a.setAttribute("id", "autocomplete-list");
-    a.setAttribute("class", "autocomplete-items");
-    /*append the DIV element as a child of the autocomplete container:*/
-    input.parentNode.appendChild(a);
+    let dropDownList = document.createElement("DIV");
+    dropDownList.setAttribute("id", "autocomplete-list");
+    dropDownList.setAttribute("class", "autocomplete-items");
+    /*append the DIV element as dropDownList child of the autocomplete container:*/
+    input.parentNode.appendChild(dropDownList);
     /*for each item in the array...*/
-    for (let i = 0; i < searchResultArray.length; i++) {
-        /*create a DIV element for each matching element:*/
-        let b = document.createElement("DIV");
-        let searchString = "";
+    searchResultArray.forEach((result) => {
+        /*create dropDownList DIV element for each matching element:*/
+        let dropDownInstance = document.createElement("DIV");
         /*make the matching letters bold:*/
-        b.innerHTML = "<strong>" + searchResultArray[i].name + "</strong>";
-        switch (searchResultArray[i]._type) {
+        dropDownInstance.innerHTML = "<strong>" + result.name + "</strong>";
+        switch (result._type) {
             case "artist":
-                b.innerHTML += ", " + searchResultArray[i].main_category + " in " + "<strong style='color: darkmagenta'>" + " Artists " + "</strong>";
+                dropDownInstance.innerHTML += ", " + result.main_category + " in " + "<strong style='color: darkmagenta'>" + " Artists " + "</strong>";
                 break;
             case "city":
-                b.innerHTML += ", " + searchResultArray[i].province + " in " + "<strong style='color: darkmagenta'>" + " Cities " + "</strong>";;
+                dropDownInstance.innerHTML += ", " + result.province + " in " + "<strong style='color: darkmagenta'>" + " Cities " + "</strong>";
                 break;
         }
-        /*insert a input field that will hold the current array item's value:*/
-        b.innerHTML += "<input type='hidden' value='" + searchResultArray[i].name + "'>";
-        /*execute a function when someone clicks on the item value (DIV element):*/
-        b.addEventListener("click", function(e) {
+        /*insert dropDownList input field that will hold the current array item's value:*/
+        dropDownInstance.innerHTML += "<input type='hidden' value='" + result.name + "'>";
+        /*execute dropDownList function when someone clicks on the item value (DIV element):*/
+        dropDownInstance.addEventListener("click", function() {
             /*insert the value for the autocomplete text field:*/
             input.value = this.getElementsByTagName("input")[0].value;
             /*close the list of autocompleted values,
             (or any other open lists of autocompleted values:*/
             closeAllLists();
         });
-        a.appendChild(b);
-    }
+        dropDownList.appendChild(dropDownInstance);
+    });
 }
 
 function getJsonFromAPI(searchQuery, callBack) {
@@ -187,13 +193,13 @@ function removeActive(x) {
         x[i].classList.remove("autocomplete-active");
     }
 }
-function closeAllLists(elmnt) {
+function closeAllLists(element) {
     /*close all autocomplete lists in the document,
     except the one passed as an argument:*/
     let x = document.getElementsByClassName("autocomplete-items");
     let input = document.getElementById(inputId);
     for (let i = 0; i < x.length; i++) {
-        if (elmnt != x[i] && elmnt != input) {
+        if (element !== x[i] && element !== input) {
             x[i].parentNode.removeChild(x[i]);
         }
     }
