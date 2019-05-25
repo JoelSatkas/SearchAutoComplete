@@ -12,9 +12,9 @@ This way we dont need to be making network calls on every keypress and mobile da
 experience using the site.  
 
 
-#Run
+###### Run
 1. In command line, `node server.js`
 2. goto `http://localhost:8000`
 
-#Test
+###### Test
 `http://localhost:8000/spec/test-runner.spec.html`
