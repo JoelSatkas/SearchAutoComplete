@@ -1,5 +1,7 @@
 # SearchAutoComplete
 
+![alt text](demo.PNG "Demo")
+
 A small example page of an autocomplete search function that will suggest searches based on what the user types.
 Done in plain HTML and JavaScript.
 
